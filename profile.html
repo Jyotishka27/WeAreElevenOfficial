@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User Profile - We Are Eleven</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+  <!-- ✅ Header -->
+  <header class="bg-gray-950 shadow-lg sticky top-0 z-50">
+    <div class="container mx-auto flex justify-between items-center p-4">
+      <h1 class="text-2xl font-bold text-green-400">We Are Eleven</h1>
+      <nav class="space-x-6">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="team_list.html" class="nav-link">Teams</a>
+        <a href="team_fixtures.html" class="nav-link">Fixtures</a>
+        <a href="tournament.html" class="nav-link">Tournaments</a>
+        <a href="about_us.html" class="nav-link">About Us</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ✅ Profile Section -->
+  <section class="relative min-h-screen flex items-center justify-center bg-gray-900 px-6">
+    <div class="bg-gray-800 shadow-2xl rounded-2xl w-full max-w-lg p-8 text-center">
+      <h2 class="text-3xl font-bold text-green-400 mb-6">My Profile</h2>
+
+      <!-- Profile Picture -->
+      <div class="flex justify-center mb-6">
+        <img id="profilePic" src="https://ui-avatars.com/api/?name=User&background=22c55e&color=fff&size=128" 
+             alt="Profile Picture" 
+             class="w-28 h-28 rounded-full border-4 border-green-400 shadow-lg">
+      </div>
+
+      <!-- User Info -->
+      <div class="space-y-3 text-left bg-gray-900 p-6 rounded-xl shadow-inner">
+        <p><span class="font-semibold text-green-400">Name:</span> <span id="displayName">Loading...</span></p>
+        <p><span class="font-semibold text-green-400">Email:</span> <span id="displayEmail">Loading...</span></p>
+        <p><span class="font-semibold text-green-400">Member Since:</span> <span id="displayDate">Loading...</span></p>
+      </div>
+
+      <!-- Logout -->
+      <button id="logoutBtn" 
+              class="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-lg shadow-lg transition">
+        Logout
+      </button>
+    </div>
+  </section>
+
+  <!-- ✅ Footer -->
+  <footer class="bg-gray-950 py-6 text-center text-gray-400">
+    <p>© 2025 We Are Eleven. All Rights Reserved.</p>
+  </footer>
+
+  <!-- ✅ Firebase Setup -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    // Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyB0DaaYB1hZLY8h23QOpT7Ok4sX5ACkHTM",
+      authDomain: "we-are-eleven.firebaseapp.com",
+      projectId: "we-are-eleven",
+      storageBucket: "we-are-eleven.firebasestorage.app",
+      messagingSenderId: "446706356039",
+      appId: "1:446706356039:web:54cc424f2a8178ae824662",
+      measurementId: "G-CX1LHHXBDQ"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Load user profile
+    const displayNameEl = document.getElementById("displayName");
+    const displayEmailEl = document.getElementById("displayEmail");
+    const displayDateEl = document.getElementById("displayDate");
+    const profilePicEl = document.getElementById("profilePic");
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        displayNameEl.textContent = user.displayName || "Footballer";
+        displayEmailEl.textContent = user.email;
+        displayDateEl.textContent = user.metadata.creationTime;
+
+        // Generate avatar dynamically
+        profilePicEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || "User")}&background=22c55e&color=fff&size=128`;
+      } else {
+        // Redirect if no user logged in
+        window.location.href = "register_login.html";
+      }
+    });
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        window.location.href = "join.html";
+      }).catch((error) => {
+        console.error("Logout error:", error);
+      });
+    });
+  </script>
+</body>
+</html>

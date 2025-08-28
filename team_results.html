@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Standings - We Are Eleven</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); color: #1e293b; }
+    .section-header { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; position: relative; overflow: hidden; }
+    .section-header::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, #64748b, transparent); animation: shimmer 3s infinite; }
+    @keyframes shimmer { 0% { left: -100%; } 100% { left: 100%; } }
+    .team-logo { height: 40px; width: 40px; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+    .match-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); }
+    .match-card { border-radius: 1rem; border: 1px solid #e5e7eb; padding: 1.25rem; box-shadow: 0 2px 6px rgba(0,0,0,0.08); display: flex; flex-direction: column; align-items: center; }
+    .match-title { font-weight: 700; text-transform: uppercase; font-size: 0.9rem; color: #475569; margin-bottom: 0.75rem; }
+    .score-row { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+    .team-side { display: flex; flex-direction: column; align-items: center; flex: 1; }
+    .team-name { font-weight: 600; font-size: 0.9rem; margin-top: 0.25rem; text-align: center; }
+    .score { font-size: 1.5rem; font-weight: 700; margin-top: 0.5rem; }
+    .vs { font-weight: 700; font-size: 1rem; color: #475569; margin: 0 1rem; }
+    .scorers { margin-top: 0.75rem; font-size: 0.8rem; color: #374151; text-align: center; }
+
+    /* Stage-specific styling */
+    .semis { background: linear-gradient(135deg, #eff6ff, #dbeafe); }
+    .third { background: linear-gradient(135deg, #f3f4f6, #e5e7eb); }
+    .champion { border: 2px solid #fbbf24; position: relative; background: linear-gradient(135deg, #fffbea, #fef9c3); }
+    .champion::before { content: "👑"; position: absolute; top: -12px; right: -12px; background: #fbbf24; border-radius: 9999px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2); font-size: 1.2rem; }
+      /* Table polish */
+    .tbl { border-collapse: separate; border-spacing: 0; overflow: hidden; border-radius: 1rem; }
+    .tbl thead th { position: sticky; top: 0; background: #f8fafc; z-index: 1; }
+    .tbl th, .tbl td { padding: .6rem .9rem; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+    .tbl tbody tr:nth-child(odd) { background: #f9fafb; }
+    .tbl tbody tr:hover { background: #eef2ff; }
+    .sep-x > * + * { border-left: 1px solid #e2e8f0; }
+    .pos { width: 2.5rem; text-align: center; font-weight: 700; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .team-cell { display: flex; align-items: center; gap: .6rem; }
+    .chip { font-size: .7rem; padding: .2rem .5rem; border-radius: 9999px; border: 1px solid #cbd5e1; background:#f8fafc; }
+    .rank-1 { box-shadow: inset 4px 0 0 #22c55e; }
+    .rank-2 { box-shadow: inset 4px 0 0 #a3e635; }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+  <!-- Header -->
+  <div id="site-header"></div>
+
+  <!-- Main -->
+  <main class="flex-grow max-w-7xl mx-auto p-6 space-y-10">
+    <!-- Groups -->
+    <section class="section-header rounded-2xl shadow-lg p-8">
+      <div class="text-center mb-6">
+        <h1 class="text-4xl font-extrabold text-gray-900">Score Tables</h1>
+      </div>
+      <div class="grid grid-cols-1 gap-8">
+        <!-- Group A -->
+        <div class="card rounded-2xl p-6 border border-slate-200 bg-white">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold">Group A</h2>
+            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-slate-100 border">Thunderbolt · Messiah FC · White Panthers</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="tbl w-full text-sm">
+              <colgroup>
+                <col style="width:3rem" />
+                <col />
+                <col style="width:3.2rem" /><col style="width:3.2rem" /><col style="width:3.2rem" /><col style="width:3.2rem" />
+                <col style="width:3.2rem" /><col style="width:3.2rem" /><col style="width:3.2rem" /><col style="width:3.2rem" />
+              </colgroup>
+              <thead class="text-slate-800 bg-slate-50">
+                <tr class="sep-x">
+                  <th class="pos">#</th>
+                  <th class="text-left py-2">Team</th>
+                  <th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
+                </tr>
+              </thead>
+              <tbody class="font-medium">
+                <tr class="rank-1 qualified">
+                  <td class="pos">1</td>
+                  <td class="py-2"><div class="team-cell"><img src="Messiah FC.jpg" alt="Messiah FC" class="team-logo"/><span>Messiah FC</span></div></td>
+                  <td class="num">4</td><td class="num">1</td><td class="num">3</td><td class="num">0</td><td class="num">4</td><td class="num">2</td><td class="num">+2</td><td class="num">6</td>
+                </tr>
+                <tr class="rank-2 qualified">
+                  <td class="pos">2</td>
+                  <td class="py-2"><div class="team-cell"><img src="White Panthers.jpg" alt="White Panthers" class="team-logo"/><span>White Panthers</span></div></td>
+                  <td class="num">4</td><td class="num">1</td><td class="num">2</td><td class="num">1</td><td class="num">2</td><td class="num">2</td><td class="num">0</td><td class="num">5</td>
+                </tr>
+                <tr>
+                  <td class="pos">3</td>
+                  <td class="py-2"><div class="team-cell"><img src="Thunderbolt.jpg" alt="Thunderbolt" class="team-logo"/><span>Thunderbolt</span></div></td>
+                  <td class="num">4</td><td class="num">1</td><td class="num">1</td><td class="num">2</td><td class="num">2</td><td class="num">4</td><td class="num">-2</td><td class="num">4</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Group B -->
+        <div class="card rounded-2xl p-6 border border-slate-200 bg-white">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold">Group B</h2>
+            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-slate-100 border">Amigos FC · Strawhat Pirates · Red Bulls Eleven</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="tbl w-full text-sm">
+              <colgroup>
+                <col style="width:3rem" />
+                <col />
+                <col style="width:3.2rem" /><col style="width:3.2rem" /><col style="width:3.2rem" /><col style="width:3.2rem" />
+                <col style="width:3.2rem" /><col style="width:3.2rem" /><col style="width:3.2rem" /><col style="width:3.2rem" />
+              </colgroup>
+              <thead class="text-slate-800 bg-slate-50">
+                <tr class="sep-x">
+                  <th class="pos">#</th>
+                  <th class="text-left py-2">Team</th>
+                  <th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
+                </tr>
+              </thead>
+              <tbody class="font-medium">
+                <tr class="rank-1 qualified">
+                  <td class="pos">1</td>
+                  <td class="py-2"><div class="team-cell"><img src="Amigos FC.jpg" alt="Amigos FC" class="team-logo"/><span>Amigos FC</span></div></td>
+                  <td class="num">4</td><td class="num">2</td><td class="num">1</td><td class="num">1</td><td class="num">3</td><td class="num">1</td><td class="num">+2</td><td class="num">7</td>
+                </tr>
+                <tr class="rank-2 qualified">
+                  <td class="pos">2</td>
+                  <td class="py-2"><div class="team-cell"><img src="Strawhat Pirates.jpg" alt="Strawhat Pirates" class="team-logo"/><span>Strawhat Pirates</span></div></td>
+                  <td class="num">4</td><td class="num">1</td><td class="num">3</td><td class="num">0</td><td class="num">5</td><td class="num">4</td><td class="num">+1</td><td class="num">6</td>
+                </tr>
+                <tr>
+                  <td class="pos">3</td>
+                  <td class="py-2"><div class="team-cell"><img src="Red Bulls Eleven.jpg" alt="Red Bulls Eleven" class="team-logo"/><span>Red Bulls Eleven</span></div></td>
+                  <td class="num">4</td><td class="num">0</td><td class="num">2</td><td class="num">2</td><td class="num">4</td><td class="num">7</td><td class="num">-3</td><td class="num">2</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Semi Finals -->
+    <section class="section-header rounded-2xl shadow-lg p-8">
+      <div class="text-center mb-6">
+        <h2 class="text-3xl font-bold">Semi Finals</h2>
+      </div>
+      <div class="match-grid">
+        <!-- SF1 -->
+        <div class="match-card semis">
+          <div class="match-title">Semi-final 1</div>
+          <div class="score-row">
+            <div class="team-side">
+              <img src="Messiah FC.jpg" alt="Messiah FC" class="team-logo" />
+              <div class="team-name">Messiah FC</div>
+              <div class="score">0</div>
+            </div>
+            <div class="vs">VS</div>
+            <div class="team-side">
+              <img src="Strawhat Pirates.jpg" alt="Strawhat Pirates" class="team-logo" />
+              <div class="team-name">Strawhat Pirates</div>
+              <div class="score">0</div>
+            </div>
+          </div>
+          <div class="scorers">Penalties: 1–3 (Strawhat Pirates win)</div>
+          <div class="scorers">No scorers</div>
+        </div>
+        <!-- SF2 -->
+        <div class="match-card semis">
+          <div class="match-title">Semi-final 2</div>
+          <div class="score-row">
+            <div class="team-side">
+              <img src="Amigos FC.jpg" alt="Amigos FC" class="team-logo" />
+              <div class="team-name">Amigos FC</div>
+              <div class="score">3</div>
+            </div>
+            <div class="vs">VS</div>
+            <div class="team-side">
+              <img src="White Panthers.jpg" alt="White Panthers" class="team-logo" />
+              <div class="team-name">White Panthers</div>
+              <div class="score">0</div>
+            </div>
+          </div>
+          <div class="scorers">Scorers: Vasu (Kaustav), Sany, Vasu</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Third Place -->
+    <section class="section-header rounded-2xl shadow-lg p-8">
+      <div class="text-center mb-6">
+        <h2 class="text-3xl font-bold">Third Place</h2>
+      </div>
+      <div class="match-grid">
+        <div class="match-card third">
+          <div class="match-title">Third Place Match</div>
+          <div class="score-row">
+            <div class="team-side">
+              <img src="Messiah FC.jpg" alt="Messiah FC" class="team-logo" />
+              <div class="team-name">Messiah FC</div>
+              <div class="score">4</div>
+            </div>
+            <div class="vs">VS</div>
+            <div class="team-side">
+              <img src="White Panthers.jpg" alt="White Panthers" class="team-logo" />
+              <div class="team-name">White Panthers</div>
+              <div class="score">1</div>
+            </div>
+          </div>
+          <div class="scorers">Messiah FC: Rishov (Ritam), Ritam, Ritam (Satyaki), Ritam</div>
+          <div class="scorers">White Panthers: Soumik</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final -->
+    <section class="section-header rounded-2xl shadow-lg p-8">
+      <div class="text-center mb-6">
+        <h2 class="text-3xl font-bold">Final</h2>
+      </div>
+      <div class="match-grid">
+        <div class="match-card champion">
+          <div class="match-title">Championship Final</div>
+          <div class="score-row">
+            <div class="team-side">
+              <img src="Strawhat Pirates.jpg" alt="Strawhat Pirates" class="team-logo" />
+              <div class="team-name">Strawhat Pirates</div>
+              <div class="score">1</div>
+            </div>
+            <div class="vs">VS</div>
+            <div class="team-side">
+              <img src="Amigos FC.jpg" alt="Amigos FC" class="team-logo" />
+              <div class="team-name">Amigos FC</div>
+              <div class="score">2</div>
+            </div>
+          </div>
+          <div class="scorers">Strawhat Pirates: Supratim (Monty)</div>
+          <div class="scorers">Amigos FC: Rony (Rahul), Sany</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-950 py-8 text-center text-gray-400 mt-12">
+    <div class="max-w-4xl mx-auto px-4">
+      <p class="text-lg">© 2025 Football Community. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Header injection -->
+  <script type="module">
+    import { injectHeader } from "./tournament_header.js";
+    injectHeader("#site-header", { active: "results" });
+  </script>
+</body>
+</html>
