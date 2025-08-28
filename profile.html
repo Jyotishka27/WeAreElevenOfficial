@@ -6,14 +6,14 @@
   <title>User Profile - We Are Eleven</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-    }
+    body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
+    .nav-link { color:#d1d5db; }
+    .nav-link:hover { color:#22c55e; }
   </style>
 </head>
 <body class="bg-gray-900 text-white">
 
-  <!-- ✅ Header -->
+  <!-- Header -->
   <header class="bg-gray-950 shadow-lg sticky top-0 z-50">
     <div class="container mx-auto flex justify-between items-center p-4">
       <h1 class="text-2xl font-bold text-green-400">We Are Eleven</h1>
@@ -27,15 +27,15 @@
     </div>
   </header>
 
-  <!-- ✅ Profile Section -->
+  <!-- Profile Section -->
   <section class="relative min-h-screen flex items-center justify-center bg-gray-900 px-6">
     <div class="bg-gray-800 shadow-2xl rounded-2xl w-full max-w-lg p-8 text-center">
       <h2 class="text-3xl font-bold text-green-400 mb-6">My Profile</h2>
 
       <!-- Profile Picture -->
       <div class="flex justify-center mb-6">
-        <img id="profilePic" src="https://ui-avatars.com/api/?name=User&background=22c55e&color=fff&size=128" 
-             alt="Profile Picture" 
+        <img id="profilePic" src="https://ui-avatars.com/api/?name=User&background=22c55e&color=fff&size=128"
+             alt="Profile Picture"
              class="w-28 h-28 rounded-full border-4 border-green-400 shadow-lg">
       </div>
 
@@ -47,24 +47,74 @@
       </div>
 
       <!-- Logout -->
-      <button id="logoutBtn" 
+      <button id="logoutBtn"
               class="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-lg shadow-lg transition">
         Logout
       </button>
+
+      <!-- Weekend Match Participation Poll -->
+      <div id="pollWrapper" class="mt-10">
+        <div id="noPoll" class="bg-gray-900 p-6 rounded-xl shadow-inner hidden">
+          <h3 class="text-2xl font-bold text-green-400 mb-2">Weekend Match Poll</h3>
+          <p class="text-gray-300">No active poll right now. Please check back later.</p>
+        </div>
+
+        <div id="pollSection" class="bg-gray-900 p-6 rounded-xl shadow-inner hidden">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h3 class="text-2xl font-bold text-green-400 mb-1">Weekend Match Poll</h3>
+              <p id="pollQuestion" class="text-lg">Loading poll...</p>
+              <p id="pollMeta" class="text-sm text-gray-400 mt-1"></p>
+            </div>
+            <span id="pollStatusPill" class="text-xs px-2 py-1 rounded-full bg-gray-700 text-gray-200">Active</span>
+          </div>
+
+          <!-- Vote buttons -->
+          <div class="mt-5 flex flex-wrap gap-3">
+            <button class="voteBtn bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg shadow-lg" data-vote="Yes">Yes</button>
+            <button class="voteBtn bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg shadow-lg" data-vote="Maybe">Maybe</button>
+            <button class="voteBtn bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg shadow-lg" data-vote="No">No</button>
+          </div>
+
+          <!-- Your vote -->
+          <div class="mt-4 text-left">
+            <p class="text-gray-300">
+              <span class="font-semibold">Your vote:</span>
+              <span id="yourVote" class="italic text-gray-400">You haven't voted yet.</span>
+            </p>
+          </div>
+
+          <!-- Lightweight tally (optional to show instantly if you want) -->
+          <div id="pollTally" class="mt-4 text-left hidden">
+            <p class="text-sm text-gray-400">Live tally:</p>
+            <ul class="text-gray-300 list-disc list-inside">
+              <li>Yes: <span id="countYes">0</span></li>
+              <li>Maybe: <span id="countMaybe">0</span></li>
+              <li>No: <span id="countNo">0</span></li>
+            </ul>
+          </div>
+
+          <p id="voteStatus" class="mt-4 text-gray-400 italic"></p>
+        </div>
+      </div>
+
     </div>
   </section>
 
-  <!-- ✅ Footer -->
+  <!-- Footer -->
   <footer class="bg-gray-950 py-6 text-center text-gray-400">
     <p>© 2025 We Are Eleven. All Rights Reserved.</p>
   </footer>
 
-  <!-- ✅ Firebase Setup -->
+  <!-- Firebase Setup -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore, doc, getDoc, setDoc, onSnapshot, collection, getCountFromServer, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // Your Firebase config
+    // Your Firebase config (as provided)
     const firebaseConfig = {
       apiKey: "AIzaSyB0DaaYB1hZLY8h23QOpT7Ok4sX5ACkHTM",
       authDomain: "we-are-eleven.firebaseapp.com",
@@ -78,34 +128,132 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    // Load user profile
+    // Profile elements
     const displayNameEl = document.getElementById("displayName");
     const displayEmailEl = document.getElementById("displayEmail");
     const displayDateEl = document.getElementById("displayDate");
     const profilePicEl = document.getElementById("profilePic");
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        displayNameEl.textContent = user.displayName || "Footballer";
-        displayEmailEl.textContent = user.email;
-        displayDateEl.textContent = user.metadata.creationTime;
+    // Poll elements
+    const pollSection = document.getElementById("pollSection");
+    const noPoll = document.getElementById("noPoll");
+    const pollQuestionEl = document.getElementById("pollQuestion");
+    const pollMetaEl = document.getElementById("pollMeta");
+    const yourVoteEl = document.getElementById("yourVote");
+    const voteStatusEl = document.getElementById("voteStatus");
+    const pollStatusPill = document.getElementById("pollStatusPill");
+    const tallyBox = document.getElementById("pollTally");
+    const countYesEl = document.getElementById("countYes");
+    const countMaybeEl = document.getElementById("countMaybe");
+    const countNoEl = document.getElementById("countNo");
 
-        // Generate avatar dynamically
-        profilePicEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || "User")}&background=22c55e&color=fff&size=128`;
-      } else {
-        // Redirect if no user logged in
+    // Auth state
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
         window.location.href = "register_login.html";
+        return;
       }
+
+      // Fill profile
+      displayNameEl.textContent = user.displayName || "Footballer";
+      displayEmailEl.textContent = user.email || "—";
+      displayDateEl.textContent = user.metadata?.creationTime || "—";
+      profilePicEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || "User")}&background=22c55e&color=fff&size=128`;
+
+      // Listen to current poll
+      const pollRef = doc(db, "polls", "current");
+      const votesCol = collection(pollRef, "votes");
+
+      onSnapshot(pollRef, async (snap) => {
+        if (!snap.exists()) {
+          pollSection.classList.add("hidden");
+          noPoll.classList.remove("hidden");
+          return;
+        }
+        const data = snap.data();
+        noPoll.classList.add("hidden");
+        pollSection.classList.remove("hidden");
+
+        // Poll content
+        pollQuestionEl.textContent = data.question || "Are you available for this Saturday's match?";
+        const created = data.createdAt?.toDate?.() || new Date();
+        pollMetaEl.textContent = `Created: ${created.toLocaleString()}`;
+        pollStatusPill.textContent = data.status ? String(data.status) : "Active";
+
+        // Show user's current vote (if any)
+        const myVoteRef = doc(votesCol, user.uid);
+        const myVoteSnap = await getDoc(myVoteRef);
+        if (myVoteSnap.exists()) {
+          const choice = myVoteSnap.data().choice;
+          yourVoteEl.textContent = choice ? choice : "You haven't voted yet.";
+        } else {
+          yourVoteEl.textContent = "You haven't voted yet.";
+        }
+
+        // Lightweight live tally (optional)
+        try {
+          tallyBox.classList.remove("hidden");
+          const [yesSnap, maybeSnap, noSnap] = await Promise.all([
+            getCountFromServer(collection(pollRef, "votes-yes")),  // optional parallel structure if you use write fan-out
+            getCountFromServer(collection(pollRef, "votes-maybe")),
+            getCountFromServer(collection(pollRef, "votes-no"))
+          ]);
+          // If you don't use fan-out subcollections, fall back to counting in main "votes" (commented alternative below).
+          countYesEl.textContent = yesSnap.data().count || 0;
+          countMaybeEl.textContent = maybeSnap.data().count || 0;
+          countNoEl.textContent = noSnap.data().count || 0;
+        } catch (e) {
+          // Fallback: count from main votes collection with one extra read
+          try {
+            const counts = { Yes: 0, Maybe: 0, No: 0 };
+            // Simple client-side tally using onSnapshot of votes (efficient for small teams)
+            onSnapshot(votesCol, (vs) => {
+              counts.Yes = 0; counts.Maybe = 0; counts.No = 0;
+              vs.forEach(d => {
+                const c = d.data()?.choice;
+                if (c === "Yes") counts.Yes++;
+                else if (c === "Maybe") counts.Maybe++;
+                else if (c === "No") counts.No++;
+              });
+              countYesEl.textContent = counts.Yes;
+              countMaybeEl.textContent = counts.Maybe;
+              countNoEl.textContent = counts.No;
+              tallyBox.classList.remove("hidden");
+            });
+          } catch { /* ignore */ }
+        }
+      });
+
+      // Voting actions
+      document.querySelectorAll(".voteBtn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const choice = btn.dataset.vote;
+          try {
+            await setDoc(doc(db, "polls", "current", "votes", user.uid), {
+              uid: user.uid,
+              name: user.displayName || "User",
+              email: user.email || "",
+              choice,
+              updatedAt: serverTimestamp()
+            });
+            yourVoteEl.textContent = choice;
+            voteStatusEl.textContent = `✅ Your vote has been recorded: ${choice}`;
+            setTimeout(() => voteStatusEl.textContent = "", 2500);
+          } catch (err) {
+            console.error(err);
+            voteStatusEl.textContent = "❌ Failed to submit your vote. Please try again.";
+          }
+        });
+      });
     });
 
     // Logout
     document.getElementById("logoutBtn").addEventListener("click", () => {
-      signOut(auth).then(() => {
-        window.location.href = "join.html";
-      }).catch((error) => {
-        console.error("Logout error:", error);
-      });
+      signOut(auth)
+        .then(() => { window.location.href = "join.html"; })
+        .catch((error) => { console.error("Logout error:", error); });
     });
   </script>
 </body>
