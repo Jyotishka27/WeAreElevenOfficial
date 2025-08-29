@@ -2,43 +2,82 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Create Poll - We Are Eleven</title>
+  <title>Create / Publish Poll - We Are Eleven</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+  <div class="bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-xl">
+    <h2 class="text-2xl font-bold text-green-400 mb-6">Create & Publish Poll</h2>
 
-  <div class="bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md">
-    <h2 class="text-2xl font-bold text-green-400 mb-6">Create Weekend Poll</h2>
-    
-    <input id="pollQuestion" type="text" placeholder="Match Question (e.g. 'Are you playing this Saturday?')" 
+    <label class="block text-sm text-gray-300 mb-2">Poll Question</label>
+    <input id="pollQuestion" type="text" placeholder="e.g. Are you playing this Saturday?"
            class="w-full px-4 py-2 rounded-lg mb-4 text-black" />
-    
-    <button id="createPollBtn" class="w-full bg-green-500 hover:bg-green-600 py-3 rounded-lg font-semibold">
-      Create Poll
-    </button>
-    
-    <p id="statusMsg" class="mt-4 text-gray-300"></p>
+
+    <div class="flex items-center gap-2 mb-6">
+      <input id="resetVotes" type="checkbox" class="w-4 h-4" />
+      <label for="resetVotes" class="text-sm text-gray-300">Reset previous votes (if any)</label>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <button id="createBtn" class="bg-slate-600 hover:bg-slate-700 py-3 rounded-lg font-semibold">Save as Draft</button>
+      <button id="publishBtn" class="bg-green-500 hover:bg-green-600 py-3 rounded-lg font-semibold">Publish Now</button>
+    </div>
+
+    <div class="mt-6 text-sm text-gray-300">
+      <p>Status: <span id="statusText" class="font-semibold">Idle</span></p>
+      <p id="hint" class="mt-2 text-gray-400">Users will see the poll on their Profile page when status is <span class="text-green-400">ACTIVE</span>.</p>
+    </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+      getFirestore, doc, setDoc, getDocs, collection, deleteDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const firebaseConfig = { /* same config */ };
+    // Use same Firebase config as profile.html
+    const firebaseConfig = {
+  apiKey: "AIzaSyB0DaaYB1hZLY8h23QOpT7Ok4sX5ACkHTM",
+  authDomain: "we-are-eleven.firebaseapp.com",
+  databaseURL: "https://we-are-eleven-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "we-are-eleven",
+  storageBucket: "we-are-eleven.firebasestorage.app",
+  messagingSenderId: "446706356039",
+  appId: "1:446706356039:web:54cc424f2a8178ae824662",
+  measurementId: "G-CX1LHHXBDQ"
+};
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    document.getElementById("createPollBtn").addEventListener("click", async () => {
-      const question = document.getElementById("pollQuestion").value;
-      if (!question) return;
+    const statusText = document.getElementById("statusText");
+    async function writePoll(status) {
+      const q = document.getElementById("pollQuestion").value?.trim();
+      if (!q) { statusText.textContent = "Please enter a question."; return; }
+      statusText.textContent = "Saving...";
+
+      // Optionally clear previous votes
+      if (document.getElementById("resetVotes").checked) {
+        try {
+          const votesCol = collection(db, "polls", "current", "votes");
+          const snaps = await getDocs(votesCol);
+          await Promise.all(snaps.docs.map(d => deleteDoc(d.ref)));
+        } catch(e) {
+          console.warn("Failed to clear old votes:", e);
+        }
+      }
 
       await setDoc(doc(db, "polls", "current"), {
-        question: question,
-        createdAt: new Date()
-      });
+        question: q,
+        status: status,               // 'DRAFT' | 'ACTIVE'
+        createdAt: serverTimestamp()
+      }, { merge: true });
 
-      document.getElementById("statusMsg").textContent = "✅ Poll Created!";
-    });
+      statusText.textContent = status === "ACTIVE" ? "✅ Published" : "💾 Saved as Draft";
+    }
+
+    document.getElementById("createBtn").addEventListener("click", () => writePoll("DRAFT"));
+    document.getElementById("publishBtn").addEventListener("click", () => writePoll("ACTIVE"));
   </script>
 </body>
 </html>
