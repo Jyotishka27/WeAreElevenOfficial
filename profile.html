@@ -116,14 +116,15 @@
 
     // Your Firebase config (as provided)
     const firebaseConfig = {
-      apiKey: "AIzaSyB0DaaYB1hZLY8h23QOpT7Ok4sX5ACkHTM",
-      authDomain: "we-are-eleven.firebaseapp.com",
-      projectId: "we-are-eleven",
-      storageBucket: "we-are-eleven.firebasestorage.app",
-      messagingSenderId: "446706356039",
-      appId: "1:446706356039:web:54cc424f2a8178ae824662",
-      measurementId: "G-CX1LHHXBDQ"
-    };
+  apiKey: "AIzaSyB0DaaYB1hZLY8h23QOpT7Ok4sX5ACkHTM",
+  authDomain: "we-are-eleven.firebaseapp.com",
+  databaseURL: "https://we-are-eleven-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "we-are-eleven",
+  storageBucket: "we-are-eleven.firebasestorage.app",
+  messagingSenderId: "446706356039",
+  appId: "1:446706356039:web:54cc424f2a8178ae824662",
+  measurementId: "G-CX1LHHXBDQ"
+};
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
@@ -180,6 +181,15 @@
         pollQuestionEl.textContent = data.question || "Are you available for this Saturday's match?";
         const created = data.createdAt?.toDate?.() || new Date();
         pollMetaEl.textContent = `Created: ${created.toLocaleString()}`;
+        // Status pill + disable voting if not ACTIVE
+        const status = data.status || "ACTIVE";
+        pollStatusPill.textContent = status;
+        if (status !== "ACTIVE") {
+          document.querySelectorAll(".voteBtn").forEach(b => { b.disabled = true; b.classList.add("opacity-50","cursor-not-allowed"); });
+        } else {
+          document.querySelectorAll(".voteBtn").forEach(b => { b.disabled = false; b.classList.remove("opacity-50","cursor-not-allowed"); });
+        }
+    
         pollStatusPill.textContent = data.status ? String(data.status) : "Active";
 
         // Show user's current vote (if any)
