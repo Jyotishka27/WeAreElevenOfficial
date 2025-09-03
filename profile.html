@@ -5,118 +5,109 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>User Profile - We Are Eleven</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
-    .nav-link { color:#d1d5db; }
-    .nav-link:hover { color:#22c55e; }
-  </style>
 </head>
-<body class="bg-gray-900 text-white">
+<body class="bg-gray-100 text-gray-900">
 
-  <!-- Header -->
-  <header class="bg-gray-950 shadow-lg sticky top-0 z-50">
-    <div class="container mx-auto flex justify-between items-center p-4">
-      <h1 class="text-2xl font-bold text-green-400">We Are Eleven</h1>
-      <nav class="space-x-6">
-        <a href="index.html" class="nav-link">Home</a>
-        <a href="team_list.html" class="nav-link">Teams</a>
-        <a href="team_fixtures.html" class="nav-link">Fixtures</a>
-        <a href="tournament.html" class="nav-link">Tournaments</a>
-        <a href="about_us.html" class="nav-link">About Us</a>
-      </nav>
+  <!-- Banner -->
+  <div class="relative bg-gradient-to-r from-green-500 to-green-700 h-40">
+    <div class="absolute left-1/2 transform -translate-x-1/2 bottom-0 translate-y-1/2">
+      <img id="profilePic" 
+           src="https://ui-avatars.com/api/?name=User&background=22c55e&color=fff&size=128"
+           class="w-28 h-28 rounded-full border-4 border-white shadow-lg">
     </div>
-  </header>
+  </div>
 
-  <!-- Profile Section -->
-  <section class="relative min-h-screen flex items-center justify-center bg-gray-900 px-6">
-    <div class="bg-gray-800 shadow-2xl rounded-2xl w-full max-w-lg p-8 text-center">
-      <h2 class="text-3xl font-bold text-green-400 mb-6">My Profile</h2>
-
-      <!-- Profile Picture -->
-      <div class="flex justify-center mb-6">
-        <img id="profilePic" src="https://ui-avatars.com/api/?name=User&background=22c55e&color=fff&size=128"
-             alt="Profile Picture"
-             class="w-28 h-28 rounded-full border-4 border-green-400 shadow-lg">
+  <!-- Profile Info -->
+  <section class="max-w-4xl mx-auto mt-20 px-6">
+    <div class="bg-white shadow-lg rounded-2xl p-6 flex flex-col md:flex-row items-center md:items-start gap-6">
+      <div class="flex-1 text-center md:text-left">
+        <h2 id="displayName" class="text-2xl font-bold text-gray-800">Loading...</h2>
+        <p id="displayEmail" class="text-gray-500">Loading...</p>
+        <p class="text-sm text-gray-400">Member Since: <span id="displayDate">Loading...</span></p>
+        <p class="text-sm text-gray-500 mt-2"><b>Position:</b> <span id="displayPosition">Not set</span></p>
+        <p class="text-sm text-gray-500"><b>About Me:</b> <span id="displayAbout">Not set</span></p>
       </div>
-
-      <!-- User Info -->
-      <div class="space-y-3 text-left bg-gray-900 p-6 rounded-xl shadow-inner">
-        <p><span class="font-semibold text-green-400">Name:</span> <span id="displayName">Loading...</span></p>
-        <p><span class="font-semibold text-green-400">Email:</span> <span id="displayEmail">Loading...</span></p>
-        <p><span class="font-semibold text-green-400">Member Since:</span> <span id="displayDate">Loading...</span></p>
+      <div class="flex flex-col gap-2">
+        <button id="editBtn"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg shadow">
+          Edit Profile
+        </button>
+        <button id="logoutBtn"
+                class="bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-2 rounded-lg shadow">
+          Logout
+        </button>
       </div>
-
-      <!-- Logout -->
-      <button id="logoutBtn"
-              class="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-lg shadow-lg transition">
-        Logout
-      </button>
-
-      <!-- Weekend Match Participation Poll -->
-      <div id="pollWrapper" class="mt-10">
-        <div id="noPoll" class="bg-gray-900 p-6 rounded-xl shadow-inner hidden">
-          <h3 class="text-2xl font-bold text-green-400 mb-2">Weekend Match Poll</h3>
-          <p class="text-gray-300">No active poll right now. Please check back later.</p>
-        </div>
-
-        <div id="pollSection" class="bg-gray-900 p-6 rounded-xl shadow-inner hidden">
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <h3 class="text-2xl font-bold text-green-400 mb-1">Weekend Match Poll</h3>
-              <p id="pollQuestion" class="text-lg">Loading poll...</p>
-              <p id="pollMeta" class="text-sm text-gray-400 mt-1"></p>
-            </div>
-            <span id="pollStatusPill" class="text-xs px-2 py-1 rounded-full bg-gray-700 text-gray-200">Active</span>
-          </div>
-
-          <!-- Vote buttons -->
-          <div class="mt-5 flex flex-wrap gap-3">
-            <button class="voteBtn bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg shadow-lg" data-vote="Yes">Yes</button>
-            <button class="voteBtn bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg shadow-lg" data-vote="Maybe">Maybe</button>
-            <button class="voteBtn bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg shadow-lg" data-vote="No">No</button>
-          </div>
-
-          <!-- Your vote -->
-          <div class="mt-4 text-left">
-            <p class="text-gray-300">
-              <span class="font-semibold">Your vote:</span>
-              <span id="yourVote" class="italic text-gray-400">You haven't voted yet.</span>
-            </p>
-          </div>
-
-          <!-- Live tally -->
-          <div id="pollTally" class="mt-4 text-left">
-            <p class="text-sm text-gray-400">Live tally:</p>
-            <ul class="text-gray-300 list-disc list-inside">
-              <li>Yes: <span id="countYes">0</span></li>
-              <li>Maybe: <span id="countMaybe">0</span></li>
-              <li>No: <span id="countNo">0</span></li>
-            </ul>
-          </div>
-
-          <p id="voteStatus" class="mt-4 text-gray-400 italic"></p>
-        </div>
-      </div>
-
     </div>
   </section>
 
-  
+  <!-- Edit Profile Modal -->
+  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white p-6 rounded-2xl shadow-lg w-full max-w-md">
+      <h3 class="text-xl font-bold mb-4">Edit Profile</h3>
+      <form id="editForm" class="space-y-3">
+        <div>
+          <label class="block text-gray-700 text-sm">Name</label>
+          <input type="text" id="editName" class="w-full border rounded p-2">
+        </div>
+        <div>
+          <label class="block text-gray-700 text-sm">Position</label>
+          <input type="text" id="editPosition" class="w-full border rounded p-2">
+        </div>
+        <div>
+          <label class="block text-gray-700 text-sm">About Me</label>
+          <textarea id="editAbout" class="w-full border rounded p-2"></textarea>
+        </div>
+        <div class="flex justify-end gap-3 mt-4">
+          <button type="button" id="cancelEdit"
+                  class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg">Cancel</button>
+          <button type="submit"
+                  class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Current Poll -->
+  <section class="max-w-4xl mx-auto mt-8 px-6">
+    <div class="bg-white shadow-lg rounded-2xl p-6">
+      <h3 class="text-xl font-bold text-green-600 mb-4">Weekend Match Poll</h3>
+      <div id="noPoll" class="text-gray-500 hidden">No active poll right now. Please check back later.</div>
+
+      <div id="pollSection" class="hidden">
+        <p id="pollQuestion" class="text-lg font-semibold mb-2">Loading poll...</p>
+        <p id="pollMeta" class="text-sm text-gray-400 mb-4"></p>
+        <div class="flex gap-3 mb-4">
+          <button class="voteBtn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg" data-vote="Yes">Yes</button>
+          <button class="voteBtn bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg" data-vote="Maybe">Maybe</button>
+          <button class="voteBtn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg" data-vote="No">No</button>
+        </div>
+        <p class="text-gray-600"><b>Your Vote:</b> <span id="yourVote">You haven't voted yet.</span></p>
+        <div class="mt-4">
+          <h4 class="text-sm text-gray-500">Live Tally:</h4>
+          <ul class="text-gray-700 list-disc list-inside">
+            <li>Yes: <span id="countYes">0</span></li>
+            <li>Maybe: <span id="countMaybe">0</span></li>
+            <li>No: <span id="countNo">0</span></li>
+          </ul>
+        </div>
+        <p id="voteStatus" class="mt-3 text-sm text-gray-500 italic"></p>
+      </div>
+    </div>
+  </section>
+
   <!-- Past Polls -->
-  <section class="bg-gray-800 p-6 rounded-xl shadow-lg mt-6 mx-auto max-w-lg">
-    <h2 class="text-xl font-bold text-green-400 mb-4">Past Polls</h2>
-    <div id="userPollHistory">Loading...</div>
+  <section class="max-w-4xl mx-auto mt-8 px-6 mb-12">
+    <div class="bg-white shadow-lg rounded-2xl p-6">
+      <h3 class="text-xl font-bold text-green-600 mb-4">Past Polls</h3>
+      <div id="userPollHistory" class="text-gray-500">Loading...</div>
+    </div>
   </section>
-<!-- Footer -->
-  <footer class="bg-gray-950 py-6 text-center text-gray-400">
-    <p>© 2025 We Are Eleven. All Rights Reserved.</p>
-  </footer>
 
-  <!-- Firebase Setup -->
+  <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB0DaaYB1hZLY8h23QOpT7Ok4sX5ACkHTM",
@@ -131,22 +122,19 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Elements
-    const displayNameEl = document.getElementById("displayName");
-    const displayEmailEl = document.getElementById("displayEmail");
-    const displayDateEl = document.getElementById("displayDate");
-    const profilePicEl = document.getElementById("profilePic");
+    // Profile elements
+    const nameEl = document.getElementById("displayName");
+    const emailEl = document.getElementById("displayEmail");
+    const dateEl = document.getElementById("displayDate");
+    const posEl = document.getElementById("displayPosition");
+    const aboutEl = document.getElementById("displayAbout");
+    const picEl = document.getElementById("profilePic");
 
-    const pollSection = document.getElementById("pollSection");
-    const noPoll = document.getElementById("noPoll");
-    const pollQuestionEl = document.getElementById("pollQuestion");
-    const pollMetaEl = document.getElementById("pollMeta");
-    const yourVoteEl = document.getElementById("yourVote");
-    const voteStatusEl = document.getElementById("voteStatus");
-    const pollStatusPill = document.getElementById("pollStatusPill");
-    const countYesEl = document.getElementById("countYes");
-    const countMaybeEl = document.getElementById("countMaybe");
-    const countNoEl = document.getElementById("countNo");
+    // Modal elements
+    const modal = document.getElementById("editModal");
+    const editName = document.getElementById("editName");
+    const editPosition = document.getElementById("editPosition");
+    const editAbout = document.getElementById("editAbout");
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -154,109 +142,66 @@
         return;
       }
 
-      // Fill profile info
-      displayNameEl.textContent = user.displayName || "Footballer";
-      displayEmailEl.textContent = user.email || "—";
-      displayDateEl.textContent = user.metadata?.creationTime || "—";
-      profilePicEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || "User")}&background=22c55e&color=fff&size=128`;
+      // Show basic info
+      nameEl.textContent = user.displayName || "Footballer";
+      emailEl.textContent = user.email || "—";
+      dateEl.textContent = user.metadata?.creationTime || "—";
+      picEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || "User")}&background=22c55e&color=fff&size=128`;
 
-      const pollRef = doc(db, "polls", "current");
-      const votesCol = collection(pollRef, "votes");
+      // Load extended info from Firestore
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        posEl.textContent = data.position || "Not set";
+        aboutEl.textContent = data.about || "Not set";
+      }
 
-      // Poll listener
-      onSnapshot(pollRef, async (snap) => {
-        if (!snap.exists()) {
-          pollSection.classList.add("hidden");
-          noPoll.classList.remove("hidden");
-          return;
+      // Edit button opens modal
+      document.getElementById("editBtn").addEventListener("click", () => {
+        modal.classList.remove("hidden");
+        editName.value = nameEl.textContent;
+        editPosition.value = posEl.textContent !== "Not set" ? posEl.textContent : "";
+        editAbout.value = aboutEl.textContent !== "Not set" ? aboutEl.textContent : "";
+      });
+
+      // Cancel edit
+      document.getElementById("cancelEdit").addEventListener("click", () => {
+        modal.classList.add("hidden");
+      });
+
+      // Save profile
+      document.getElementById("editForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const newName = editName.value.trim();
+        const newPos = editPosition.value.trim();
+        const newAbout = editAbout.value.trim();
+
+        try {
+          // Update Firebase Auth displayName
+          if (newName) {
+            await updateProfile(user, { displayName: newName });
+            nameEl.textContent = newName;
+          }
+          // Update Firestore user doc
+          await setDoc(userRef, {
+            position: newPos,
+            about: newAbout
+          }, { merge: true });
+
+          posEl.textContent = newPos || "Not set";
+          aboutEl.textContent = newAbout || "Not set";
+          modal.classList.add("hidden");
+        } catch (err) {
+          console.error(err);
+          alert("❌ Failed to update profile.");
         }
-
-        const data = snap.data();
-        pollSection.classList.remove("hidden");
-        noPoll.classList.add("hidden");
-
-        pollQuestionEl.textContent = data.question || "Are you available for the next match?";
-        const created = data.createdAt?.toDate?.() || new Date();
-        pollMetaEl.textContent = `Created: ${created.toLocaleString()}`;
-
-        const status = data.status || "ACTIVE";
-        pollStatusPill.textContent = status;
-        document.querySelectorAll(".voteBtn").forEach(b => {
-          if (status !== "ACTIVE") {
-            b.disabled = true; b.classList.add("opacity-50","cursor-not-allowed");
-          } else {
-            b.disabled = false; b.classList.remove("opacity-50","cursor-not-allowed");
-          }
-        });
-
-        // Show user's vote
-        const myVoteRef = doc(votesCol, user.uid);
-        const myVoteSnap = await getDoc(myVoteRef);
-        yourVoteEl.textContent = myVoteSnap.exists() ? myVoteSnap.data().choice : "You haven't voted yet.";
-      });
-
-      // Live tally listener
-      onSnapshot(votesCol, (vs) => {
-        let counts = { Yes: 0, Maybe: 0, No: 0 };
-        vs.forEach(d => {
-          const c = d.data()?.choice;
-          if (c === "Yes") counts.Yes++;
-          else if (c === "Maybe") counts.Maybe++;
-          else if (c === "No") counts.No++;
-        });
-        countYesEl.textContent = counts.Yes;
-        countMaybeEl.textContent = counts.Maybe;
-        countNoEl.textContent = counts.No;
-      });
-
-      // Voting actions
-      document.querySelectorAll(".voteBtn").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const choice = btn.dataset.vote;
-          try {
-            await setDoc(doc(votesCol, user.uid), {
-              uid: user.uid,
-              name: user.displayName || "User",
-              email: user.email || "",
-              choice,
-              updatedAt: serverTimestamp()
-            });
-            yourVoteEl.textContent = choice;
-            voteStatusEl.textContent = `✅ Your vote has been recorded: ${choice}`;
-            setTimeout(() => voteStatusEl.textContent = "", 2500);
-          } catch (err) {
-            console.error(err);
-            voteStatusEl.textContent = "❌ Failed to submit your vote.";
-          }
-        });
       });
     });
 
+    // Logout
     document.getElementById("logoutBtn").addEventListener("click", () => {
       signOut(auth).then(() => { window.location.href = "join.html"; });
-    });
-
-    // Poll history for user
-    import { query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    const q = query(collection(db, "polls"), orderBy("createdAt", "desc"));
-    onSnapshot(q, (snapshot) => {
-      const container = document.getElementById("userPollHistory");
-      if (!container) return;
-      container.innerHTML = "";
-      snapshot.forEach(docSnap => {
-        if (docSnap.id === "current") return;
-        const poll = docSnap.data();
-        const created = poll.createdAt?.toDate?.().toLocaleString() || "Unknown";
-        container.innerHTML += `
-          <div class="mb-3 p-3 bg-gray-700 rounded-lg">
-            <h3 class="font-semibold">${poll.question}</h3>
-            <p class="text-sm text-gray-400">Status: ${poll.status} | Created: ${created}</p>
-          </div>
-        `;
-      });
-      if (!container.innerHTML) {
-        container.innerHTML = "<p>No past polls yet.</p>";
-      }
     });
   </script>
 </body>
