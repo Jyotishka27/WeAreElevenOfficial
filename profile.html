@@ -89,10 +89,12 @@
     const firebaseConfig = {
       apiKey: "AIzaSyB0DaaYB1hZLY8h23QOpT7Ok4sX5ACkHTM",
       authDomain: "we-are-eleven.firebaseapp.com",
+      databaseURL: "https://we-are-eleven-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "we-are-eleven",
-      storageBucket: "we-are-eleven.appspot.com",
+      storageBucket: "we-are-eleven.appspot.com",   // ✅ FIXED BUCKET
       messagingSenderId: "446706356039",
-      appId: "1:446706356039:web:54cc424f2a8178ae824662"
+      appId: "1:446706356039:web:54cc424f2a8178ae824662",
+      measurementId: "G-CX1LHHXBDQ"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -132,7 +134,7 @@
         posEl.textContent = data.position || "Not set";
         aboutEl.textContent = data.about || "Not set";
         if (data.coverPhotoURL) {
-          coverBanner.style.backgroundImage = `url(${data.coverPhotoURL})`;
+          coverBanner.style.backgroundImage = `url(${data.coverPhotoURL}?t=${Date.now()})`;
           coverBanner.style.backgroundSize = "cover";
           coverBanner.style.backgroundPosition = "center";
         }
@@ -185,14 +187,18 @@
         if (!file) return;
         const storageRef = ref(storage, `profilePictures/${user.uid}`);
         try {
+          console.log("Uploading profile picture...");
           await uploadBytes(storageRef, file);
           const url = await getDownloadURL(storageRef);
+          console.log("Profile picture URL:", url);
+
           await updateProfile(user, { photoURL: url });
           await updateDoc(userRef, { photoURL: url });
-          picEl.src = url;
+
+          picEl.src = url + "?t=" + Date.now();
           alert("✅ Profile picture updated successfully!");
         } catch (err) {
-          console.error(err);
+          console.error("Profile upload error:", err);
           alert("❌ Failed to upload profile picture.");
         }
       });
@@ -207,15 +213,19 @@
         if (!file) return;
         const coverRef = ref(storage, `coverPhotos/${user.uid}`);
         try {
+          console.log("Uploading cover photo...");
           await uploadBytes(coverRef, file);
           const url = await getDownloadURL(coverRef);
+          console.log("Cover photo URL:", url);
+
           await updateDoc(userRef, { coverPhotoURL: url });
-          coverBanner.style.backgroundImage = `url(${url})`;
+
+          coverBanner.style.backgroundImage = `url(${url}?t=${Date.now()})`;
           coverBanner.style.backgroundSize = "cover";
           coverBanner.style.backgroundPosition = "center";
           alert("✅ Cover photo updated successfully!");
         } catch (err) {
-          console.error(err);
+          console.error("Cover upload error:", err);
           alert("❌ Failed to upload cover photo.");
         }
       });
