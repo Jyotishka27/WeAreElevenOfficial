@@ -6,32 +6,44 @@
   <title>User Profile - We Are Eleven</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-gray-900 text-white">
 
-  <!-- Banner -->
-  <div class="relative bg-gradient-to-r from-green-500 to-green-700 h-40">
+  <!-- Cover Banner -->
+  <div id="coverBanner" class="relative h-48 bg-gradient-to-r from-green-600 to-green-800">
+    <button id="uploadCoverBtn"
+            class="absolute top-3 right-3 bg-black bg-opacity-40 hover:bg-opacity-70 text-white text-sm px-3 py-1 rounded shadow">
+      Change Cover Photo
+    </button>
+    <input type="file" id="coverUpload" accept="image/*" class="hidden">
+
+    <!-- Profile Picture -->
     <div class="absolute left-1/2 transform -translate-x-1/2 bottom-0 translate-y-1/2">
       <img id="profilePic" 
            src="https://ui-avatars.com/api/?name=User&background=22c55e&color=fff&size=128"
-           class="w-28 h-28 rounded-full border-4 border-white shadow-lg">
+           class="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover">
     </div>
   </div>
 
-  <!-- Profile Info -->
-  <section class="max-w-4xl mx-auto mt-20 px-6">
-    <div class="bg-white shadow-lg rounded-2xl p-6 flex flex-col md:flex-row items-center md:items-start gap-6">
+  <!-- Profile Info Card -->
+  <section class="max-w-5xl mx-auto mt-20 px-6">
+    <div class="bg-gray-800 shadow-lg rounded-2xl p-6 flex flex-col md:flex-row items-center md:items-start gap-6">
       <div class="flex-1 text-center md:text-left">
-        <h2 id="displayName" class="text-2xl font-bold text-gray-800">Loading...</h2>
-        <p id="displayEmail" class="text-gray-500">Loading...</p>
+        <h2 id="displayName" class="text-3xl font-bold text-green-400">Loading...</h2>
+        <p id="displayEmail" class="text-gray-300">Loading...</p>
         <p class="text-sm text-gray-400">Member Since: <span id="displayDate">Loading...</span></p>
-        <p class="text-sm text-gray-500 mt-2"><b>Position:</b> <span id="displayPosition">Not set</span></p>
-        <p class="text-sm text-gray-500"><b>About Me:</b> <span id="displayAbout">Not set</span></p>
+        <p class="mt-2 text-gray-300"><b>Position:</b> <span id="displayPosition">Not set</span></p>
+        <p class="text-gray-300"><b>About Me:</b> <span id="displayAbout">Not set</span></p>
       </div>
       <div class="flex flex-col gap-2">
         <button id="editBtn"
                 class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg shadow">
           Edit Profile
         </button>
+        <button id="uploadPicBtn"
+                class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-6 py-2 rounded-lg shadow">
+          Change Picture
+        </button>
+        <input type="file" id="picUpload" accept="image/*" class="hidden">
         <button id="logoutBtn"
                 class="bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-2 rounded-lg shadow">
           Logout
@@ -42,24 +54,24 @@
 
   <!-- Edit Profile Modal -->
   <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-    <div class="bg-white p-6 rounded-2xl shadow-lg w-full max-w-md">
-      <h3 class="text-xl font-bold mb-4">Edit Profile</h3>
+    <div class="bg-gray-800 text-white p-6 rounded-2xl shadow-lg w-full max-w-md">
+      <h3 class="text-xl font-bold mb-4 text-green-400">Edit Profile</h3>
       <form id="editForm" class="space-y-3">
         <div>
-          <label class="block text-gray-700 text-sm">Name</label>
-          <input type="text" id="editName" class="w-full border rounded p-2">
+          <label class="block text-sm text-gray-300">Name</label>
+          <input type="text" id="editName" class="w-full border rounded p-2 text-black">
         </div>
         <div>
-          <label class="block text-gray-700 text-sm">Position</label>
-          <input type="text" id="editPosition" class="w-full border rounded p-2">
+          <label class="block text-sm text-gray-300">Position</label>
+          <input type="text" id="editPosition" class="w-full border rounded p-2 text-black">
         </div>
         <div>
-          <label class="block text-gray-700 text-sm">About Me</label>
-          <textarea id="editAbout" class="w-full border rounded p-2"></textarea>
+          <label class="block text-sm text-gray-300">About Me</label>
+          <textarea id="editAbout" class="w-full border rounded p-2 text-black"></textarea>
         </div>
         <div class="flex justify-end gap-3 mt-4">
           <button type="button" id="cancelEdit"
-                  class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg">Cancel</button>
+                  class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg">Cancel</button>
           <button type="submit"
                   class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">Save</button>
         </div>
@@ -67,53 +79,18 @@
     </div>
   </div>
 
-  <!-- Current Poll -->
-  <section class="max-w-4xl mx-auto mt-8 px-6">
-    <div class="bg-white shadow-lg rounded-2xl p-6">
-      <h3 class="text-xl font-bold text-green-600 mb-4">Weekend Match Poll</h3>
-      <div id="noPoll" class="text-gray-500 hidden">No active poll right now. Please check back later.</div>
-
-      <div id="pollSection" class="hidden">
-        <p id="pollQuestion" class="text-lg font-semibold mb-2">Loading poll...</p>
-        <p id="pollMeta" class="text-sm text-gray-400 mb-4"></p>
-        <div class="flex gap-3 mb-4">
-          <button class="voteBtn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg" data-vote="Yes">Yes</button>
-          <button class="voteBtn bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg" data-vote="Maybe">Maybe</button>
-          <button class="voteBtn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg" data-vote="No">No</button>
-        </div>
-        <p class="text-gray-600"><b>Your Vote:</b> <span id="yourVote">You haven't voted yet.</span></p>
-        <div class="mt-4">
-          <h4 class="text-sm text-gray-500">Live Tally:</h4>
-          <ul class="text-gray-700 list-disc list-inside">
-            <li>Yes: <span id="countYes">0</span></li>
-            <li>Maybe: <span id="countMaybe">0</span></li>
-            <li>No: <span id="countNo">0</span></li>
-          </ul>
-        </div>
-        <p id="voteStatus" class="mt-3 text-sm text-gray-500 italic"></p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Past Polls -->
-  <section class="max-w-4xl mx-auto mt-8 px-6 mb-12">
-    <div class="bg-white shadow-lg rounded-2xl p-6">
-      <h3 class="text-xl font-bold text-green-600 mb-4">Past Polls</h3>
-      <div id="userPollHistory" class="text-gray-500">Loading...</div>
-    </div>
-  </section>
-
   <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB0DaaYB1hZLY8h23QOpT7Ok4sX5ACkHTM",
       authDomain: "we-are-eleven.firebaseapp.com",
       projectId: "we-are-eleven",
-      storageBucket: "we-are-eleven.firebasestorage.app",
+      storageBucket: "we-are-eleven.appspot.com",
       messagingSenderId: "446706356039",
       appId: "1:446706356039:web:54cc424f2a8178ae824662"
     };
@@ -121,16 +98,16 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const storage = getStorage(app);
 
-    // Profile elements
     const nameEl = document.getElementById("displayName");
     const emailEl = document.getElementById("displayEmail");
     const dateEl = document.getElementById("displayDate");
     const posEl = document.getElementById("displayPosition");
     const aboutEl = document.getElementById("displayAbout");
     const picEl = document.getElementById("profilePic");
+    const coverBanner = document.getElementById("coverBanner");
 
-    // Modal elements
     const modal = document.getElementById("editModal");
     const editName = document.getElementById("editName");
     const editPosition = document.getElementById("editPosition");
@@ -142,22 +119,26 @@
         return;
       }
 
-      // Show basic info
+      // Load profile info
       nameEl.textContent = user.displayName || "Footballer";
       emailEl.textContent = user.email || "—";
       dateEl.textContent = user.metadata?.creationTime || "—";
-      picEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || "User")}&background=22c55e&color=fff&size=128`;
+      picEl.src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || "User")}&background=22c55e&color=fff&size=128`;
 
-      // Load extended info from Firestore
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
       if (userSnap.exists()) {
         const data = userSnap.data();
         posEl.textContent = data.position || "Not set";
         aboutEl.textContent = data.about || "Not set";
+        if (data.coverPhotoURL) {
+          coverBanner.style.backgroundImage = `url(${data.coverPhotoURL})`;
+          coverBanner.style.backgroundSize = "cover";
+          coverBanner.style.backgroundPosition = "center";
+        }
       }
 
-      // Edit button opens modal
+      // Edit Profile Modal
       document.getElementById("editBtn").addEventListener("click", () => {
         modal.classList.remove("hidden");
         editName.value = nameEl.textContent;
@@ -165,12 +146,10 @@
         editAbout.value = aboutEl.textContent !== "Not set" ? aboutEl.textContent : "";
       });
 
-      // Cancel edit
       document.getElementById("cancelEdit").addEventListener("click", () => {
         modal.classList.add("hidden");
       });
 
-      // Save profile
       document.getElementById("editForm").addEventListener("submit", async (e) => {
         e.preventDefault();
         const newName = editName.value.trim();
@@ -178,12 +157,10 @@
         const newAbout = editAbout.value.trim();
 
         try {
-          // Update Firebase Auth displayName
           if (newName) {
             await updateProfile(user, { displayName: newName });
             nameEl.textContent = newName;
           }
-          // Update Firestore user doc
           await setDoc(userRef, {
             position: newPos,
             about: newAbout
@@ -195,6 +172,51 @@
         } catch (err) {
           console.error(err);
           alert("❌ Failed to update profile.");
+        }
+      });
+
+      // Upload Profile Picture
+      const uploadBtn = document.getElementById("uploadPicBtn");
+      const fileInput = document.getElementById("picUpload");
+
+      uploadBtn.addEventListener("click", () => fileInput.click());
+      fileInput.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const storageRef = ref(storage, `profilePictures/${user.uid}`);
+        try {
+          await uploadBytes(storageRef, file);
+          const url = await getDownloadURL(storageRef);
+          await updateProfile(user, { photoURL: url });
+          await updateDoc(userRef, { photoURL: url });
+          picEl.src = url;
+          alert("✅ Profile picture updated successfully!");
+        } catch (err) {
+          console.error(err);
+          alert("❌ Failed to upload profile picture.");
+        }
+      });
+
+      // Upload Cover Photo
+      const coverBtn = document.getElementById("uploadCoverBtn");
+      const coverInput = document.getElementById("coverUpload");
+
+      coverBtn.addEventListener("click", () => coverInput.click());
+      coverInput.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const coverRef = ref(storage, `coverPhotos/${user.uid}`);
+        try {
+          await uploadBytes(coverRef, file);
+          const url = await getDownloadURL(coverRef);
+          await updateDoc(userRef, { coverPhotoURL: url });
+          coverBanner.style.backgroundImage = `url(${url})`;
+          coverBanner.style.backgroundSize = "cover";
+          coverBanner.style.backgroundPosition = "center";
+          alert("✅ Cover photo updated successfully!");
+        } catch (err) {
+          console.error(err);
+          alert("❌ Failed to upload cover photo.");
         }
       });
     });
