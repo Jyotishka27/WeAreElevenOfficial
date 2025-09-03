@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Participation Poll</title>
+  <title>Create Match Poll</title>
   <style>
     body { font-family: Arial, sans-serif; background: #f8f9fa; padding: 20px; }
     h1 { text-align: center; }
     form { max-width: 600px; margin: auto; background: white; padding: 20px;
            border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     label { display: block; margin-top: 15px; }
-    input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; }
+    input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; }
     button { margin-top: 20px; padding: 12px; width: 100%; background: #007bff; border: none;
              color: white; font-size: 16px; border-radius: 8px; cursor: pointer; }
     button:hover { background: #0056b3; }
@@ -18,19 +18,16 @@
 </head>
 <body>
 
-  <h1>Create Participation Poll</h1>
+  <h1>Create a Match Poll</h1>
 
   <form id="pollForm">
-    <label>Match Title:</label>
-    <input type="text" id="pollTitle" placeholder="Match vs Thunderbolt - Sept 10" required>
-
-    <label>Players (comma separated):</label>
-    <input type="text" id="pollPlayers" placeholder="Player1, Player2, Player3" required>
+    <label>Match Details:</label>
+    <input type="text" id="pollTitle" placeholder="Match on Saturday TurfXL at 11 pm" required>
 
     <label>Deadline:</label>
     <input type="date" id="pollDeadline" required>
 
-    <button type="submit">Host Participation Poll</button>
+    <button type="submit">Release Poll</button>
   </form>
 
   <script>
@@ -38,28 +35,27 @@
       e.preventDefault();
 
       const title = document.getElementById("pollTitle").value.trim();
-      const players = document.getElementById("pollPlayers").value.split(",").map(p => p.trim());
       const deadline = document.getElementById("pollDeadline").value;
 
-      if (!title || players.length < 2) {
-        alert("Please enter a match title and at least 2 players!");
+      if (!title) {
+        alert("Please enter match details!");
         return;
       }
 
-      // Save poll to localStorage
+      // Save poll in localStorage
       let polls = JSON.parse(localStorage.getItem("polls")) || [];
       polls.push({
-        type: "participation",
+        type: "match",
         title,
-        players: players.map(p => ({ name: p, response: "Pending" })), // each player starts as "Pending"
         deadline,
-        createdAt: new Date().toLocaleString()
+        createdAt: new Date().toLocaleString(),
+        responses: [] // empty responses, users will fill this
       });
 
       localStorage.setItem("polls", JSON.stringify(polls));
 
-      alert("Participation Poll hosted successfully!");
-      window.location.href = "admin_profile.html"; // redirect back
+      alert("Match Poll released successfully!");
+      window.location.href = "admin_profile.html";
     });
   </script>
 
