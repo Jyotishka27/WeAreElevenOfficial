@@ -84,8 +84,8 @@
             </p>
           </div>
 
-          <!-- Lightweight tally (optional to show instantly if you want) -->
-          <div id="pollTally" class="mt-4 text-left hidden">
+          <!-- Live tally -->
+          <div id="pollTally" class="mt-4 text-left">
             <p class="text-sm text-gray-400">Live tally:</p>
             <ul class="text-gray-300 list-disc list-inside">
               <li>Yes: <span id="countYes">0</span></li>
@@ -101,7 +101,13 @@
     </div>
   </section>
 
-  <!-- Footer -->
+  
+  <!-- Past Polls -->
+  <section class="bg-gray-800 p-6 rounded-xl shadow-lg mt-6 mx-auto max-w-lg">
+    <h2 class="text-xl font-bold text-green-400 mb-4">Past Polls</h2>
+    <div id="userPollHistory">Loading...</div>
+  </section>
+<!-- Footer -->
   <footer class="bg-gray-950 py-6 text-center text-gray-400">
     <p>© 2025 We Are Eleven. All Rights Reserved.</p>
   </footer>
@@ -110,34 +116,27 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import {
-      getFirestore, doc, getDoc, setDoc, onSnapshot, collection, getCountFromServer, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // Your Firebase config (as provided)
     const firebaseConfig = {
-  apiKey: "AIzaSyB0DaaYB1hZLY8h23QOpT7Ok4sX5ACkHTM",
-  authDomain: "we-are-eleven.firebaseapp.com",
-  databaseURL: "https://we-are-eleven-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "we-are-eleven",
-  storageBucket: "we-are-eleven.firebasestorage.app",
-  messagingSenderId: "446706356039",
-  appId: "1:446706356039:web:54cc424f2a8178ae824662",
-  measurementId: "G-CX1LHHXBDQ"
-};
+      apiKey: "AIzaSyB0DaaYB1hZLY8h23QOpT7Ok4sX5ACkHTM",
+      authDomain: "we-are-eleven.firebaseapp.com",
+      projectId: "we-are-eleven",
+      storageBucket: "we-are-eleven.firebasestorage.app",
+      messagingSenderId: "446706356039",
+      appId: "1:446706356039:web:54cc424f2a8178ae824662"
+    };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Profile elements
+    // Elements
     const displayNameEl = document.getElementById("displayName");
     const displayEmailEl = document.getElementById("displayEmail");
     const displayDateEl = document.getElementById("displayDate");
     const profilePicEl = document.getElementById("profilePic");
 
-    // Poll elements
     const pollSection = document.getElementById("pollSection");
     const noPoll = document.getElementById("noPoll");
     const pollQuestionEl = document.getElementById("pollQuestion");
@@ -145,95 +144,69 @@
     const yourVoteEl = document.getElementById("yourVote");
     const voteStatusEl = document.getElementById("voteStatus");
     const pollStatusPill = document.getElementById("pollStatusPill");
-    const tallyBox = document.getElementById("pollTally");
     const countYesEl = document.getElementById("countYes");
     const countMaybeEl = document.getElementById("countMaybe");
     const countNoEl = document.getElementById("countNo");
 
-    // Auth state
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         window.location.href = "register_login.html";
         return;
       }
 
-      // Fill profile
+      // Fill profile info
       displayNameEl.textContent = user.displayName || "Footballer";
       displayEmailEl.textContent = user.email || "—";
       displayDateEl.textContent = user.metadata?.creationTime || "—";
       profilePicEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || "User")}&background=22c55e&color=fff&size=128`;
 
-      // Listen to current poll
       const pollRef = doc(db, "polls", "current");
       const votesCol = collection(pollRef, "votes");
 
+      // Poll listener
       onSnapshot(pollRef, async (snap) => {
         if (!snap.exists()) {
           pollSection.classList.add("hidden");
           noPoll.classList.remove("hidden");
           return;
         }
-        const data = snap.data();
-        noPoll.classList.add("hidden");
-        pollSection.classList.remove("hidden");
 
-        // Poll content
-        pollQuestionEl.textContent = data.question || "Are you available for this Saturday's match?";
+        const data = snap.data();
+        pollSection.classList.remove("hidden");
+        noPoll.classList.add("hidden");
+
+        pollQuestionEl.textContent = data.question || "Are you available for the next match?";
         const created = data.createdAt?.toDate?.() || new Date();
         pollMetaEl.textContent = `Created: ${created.toLocaleString()}`;
-        // Status pill + disable voting if not ACTIVE
+
         const status = data.status || "ACTIVE";
         pollStatusPill.textContent = status;
-        if (status !== "ACTIVE") {
-          document.querySelectorAll(".voteBtn").forEach(b => { b.disabled = true; b.classList.add("opacity-50","cursor-not-allowed"); });
-        } else {
-          document.querySelectorAll(".voteBtn").forEach(b => { b.disabled = false; b.classList.remove("opacity-50","cursor-not-allowed"); });
-        }
-    
-        pollStatusPill.textContent = data.status ? String(data.status) : "Active";
+        document.querySelectorAll(".voteBtn").forEach(b => {
+          if (status !== "ACTIVE") {
+            b.disabled = true; b.classList.add("opacity-50","cursor-not-allowed");
+          } else {
+            b.disabled = false; b.classList.remove("opacity-50","cursor-not-allowed");
+          }
+        });
 
-        // Show user's current vote (if any)
+        // Show user's vote
         const myVoteRef = doc(votesCol, user.uid);
         const myVoteSnap = await getDoc(myVoteRef);
-        if (myVoteSnap.exists()) {
-          const choice = myVoteSnap.data().choice;
-          yourVoteEl.textContent = choice ? choice : "You haven't voted yet.";
-        } else {
-          yourVoteEl.textContent = "You haven't voted yet.";
-        }
+        yourVoteEl.textContent = myVoteSnap.exists() ? myVoteSnap.data().choice : "You haven't voted yet.";
+      });
 
-        // Lightweight live tally (optional)
-        try {
-          tallyBox.classList.remove("hidden");
-          const [yesSnap, maybeSnap, noSnap] = await Promise.all([
-            getCountFromServer(collection(pollRef, "votes-yes")),  // optional parallel structure if you use write fan-out
-            getCountFromServer(collection(pollRef, "votes-maybe")),
-            getCountFromServer(collection(pollRef, "votes-no"))
-          ]);
-          // If you don't use fan-out subcollections, fall back to counting in main "votes" (commented alternative below).
-          countYesEl.textContent = yesSnap.data().count || 0;
-          countMaybeEl.textContent = maybeSnap.data().count || 0;
-          countNoEl.textContent = noSnap.data().count || 0;
-        } catch (e) {
-          // Fallback: count from main votes collection with one extra read
-          try {
-            const counts = { Yes: 0, Maybe: 0, No: 0 };
-            // Simple client-side tally using onSnapshot of votes (efficient for small teams)
-            onSnapshot(votesCol, (vs) => {
-              counts.Yes = 0; counts.Maybe = 0; counts.No = 0;
-              vs.forEach(d => {
-                const c = d.data()?.choice;
-                if (c === "Yes") counts.Yes++;
-                else if (c === "Maybe") counts.Maybe++;
-                else if (c === "No") counts.No++;
-              });
-              countYesEl.textContent = counts.Yes;
-              countMaybeEl.textContent = counts.Maybe;
-              countNoEl.textContent = counts.No;
-              tallyBox.classList.remove("hidden");
-            });
-          } catch { /* ignore */ }
-        }
+      // Live tally listener
+      onSnapshot(votesCol, (vs) => {
+        let counts = { Yes: 0, Maybe: 0, No: 0 };
+        vs.forEach(d => {
+          const c = d.data()?.choice;
+          if (c === "Yes") counts.Yes++;
+          else if (c === "Maybe") counts.Maybe++;
+          else if (c === "No") counts.No++;
+        });
+        countYesEl.textContent = counts.Yes;
+        countMaybeEl.textContent = counts.Maybe;
+        countNoEl.textContent = counts.No;
       });
 
       // Voting actions
@@ -241,7 +214,7 @@
         btn.addEventListener("click", async () => {
           const choice = btn.dataset.vote;
           try {
-            await setDoc(doc(db, "polls", "current", "votes", user.uid), {
+            await setDoc(doc(votesCol, user.uid), {
               uid: user.uid,
               name: user.displayName || "User",
               email: user.email || "",
@@ -253,17 +226,37 @@
             setTimeout(() => voteStatusEl.textContent = "", 2500);
           } catch (err) {
             console.error(err);
-            voteStatusEl.textContent = "❌ Failed to submit your vote. Please try again.";
+            voteStatusEl.textContent = "❌ Failed to submit your vote.";
           }
         });
       });
     });
 
-    // Logout
     document.getElementById("logoutBtn").addEventListener("click", () => {
-      signOut(auth)
-        .then(() => { window.location.href = "join.html"; })
-        .catch((error) => { console.error("Logout error:", error); });
+      signOut(auth).then(() => { window.location.href = "join.html"; });
+    });
+
+    // Poll history for user
+    import { query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    const q = query(collection(db, "polls"), orderBy("createdAt", "desc"));
+    onSnapshot(q, (snapshot) => {
+      const container = document.getElementById("userPollHistory");
+      if (!container) return;
+      container.innerHTML = "";
+      snapshot.forEach(docSnap => {
+        if (docSnap.id === "current") return;
+        const poll = docSnap.data();
+        const created = poll.createdAt?.toDate?.().toLocaleString() || "Unknown";
+        container.innerHTML += `
+          <div class="mb-3 p-3 bg-gray-700 rounded-lg">
+            <h3 class="font-semibold">${poll.question}</h3>
+            <p class="text-sm text-gray-400">Status: ${poll.status} | Created: ${created}</p>
+          </div>
+        `;
+      });
+      if (!container.innerHTML) {
+        container.innerHTML = "<p>No past polls yet.</p>";
+      }
     });
   </script>
 </body>
