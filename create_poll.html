@@ -3,59 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Match Poll</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f8f9fa; padding: 20px; }
-    h1 { text-align: center; }
-    form { max-width: 600px; margin: auto; background: white; padding: 20px;
-           border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    label { display: block; margin-top: 15px; }
-    input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; }
-    button { margin-top: 20px; padding: 12px; width: 100%; background: #007bff; border: none;
-             color: white; font-size: 16px; border-radius: 8px; cursor: pointer; }
-    button:hover { background: #0056b3; }
-  </style>
+  <title>Create Match Poll - Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
 
-  <h1>Create a Match Poll</h1>
+  <div class="bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-lg">
+    <h1 class="text-2xl font-bold text-green-400 mb-6">Create Match Poll</h1>
 
-  <form id="pollForm">
-    <label>Match Details:</label>
-    <input type="text" id="pollTitle" placeholder="Match on Saturday TurfXL at 11 pm" required>
+    <form id="pollForm" class="space-y-4">
+      <div>
+        <label class="block text-gray-300 mb-1">Match Details</label>
+        <input type="text" id="pollQuestion" placeholder="Match on Saturday TurfXL at 11pm"
+               class="w-full p-3 rounded-lg text-black" required>
+      </div>
 
-    <label>Deadline:</label>
-    <input type="date" id="pollDeadline" required>
+      <div>
+        <label class="block text-gray-300 mb-1">Status</label>
+        <select id="pollStatus" class="w-full p-3 rounded-lg text-black">
+          <option value="ACTIVE">Active</option>
+          <option value="CLOSED">Closed</option>
+        </select>
+      </div>
 
-    <button type="submit">Release Poll</button>
-  </form>
+      <button type="submit" class="w-full bg-green-500 hover:bg-green-600 py-3 rounded-lg font-semibold">
+        Release Poll
+      </button>
+    </form>
 
-  <script>
-    document.getElementById("pollForm").addEventListener("submit", function(e) {
+    <p id="statusMsg" class="mt-4 text-sm text-gray-400"></p>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB0DaaYB1hZLY8h23QOpT7Ok4sX5ACkHTM",
+      authDomain: "we-are-eleven.firebaseapp.com",
+      projectId: "we-are-eleven",
+      storageBucket: "we-are-eleven.firebasestorage.app",
+      messagingSenderId: "446706356039",
+      appId: "1:446706356039:web:54cc424f2a8178ae824662"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.getElementById("pollForm").addEventListener("submit", async (e) => {
       e.preventDefault();
+      const question = document.getElementById("pollQuestion").value.trim();
+      const status = document.getElementById("pollStatus").value;
 
-      const title = document.getElementById("pollTitle").value.trim();
-      const deadline = document.getElementById("pollDeadline").value;
-
-      if (!title) {
-        alert("Please enter match details!");
-        return;
+      try {
+        await setDoc(doc(db, "polls", "current"), {
+          question,
+          status,
+          createdAt: serverTimestamp()
+        });
+        document.getElementById("statusMsg").textContent = "✅ Poll released successfully!";
+      } catch (err) {
+        console.error(err);
+        document.getElementById("statusMsg").textContent = "❌ Failed to release poll.";
       }
-
-      // Save poll in localStorage
-      let polls = JSON.parse(localStorage.getItem("polls")) || [];
-      polls.push({
-        type: "match",
-        title,
-        deadline,
-        createdAt: new Date().toLocaleString(),
-        responses: [] // empty responses, users will fill this
-      });
-
-      localStorage.setItem("polls", JSON.stringify(polls));
-
-      alert("Match Poll released successfully!");
-      window.location.href = "admin_profile.html";
     });
   </script>
 
