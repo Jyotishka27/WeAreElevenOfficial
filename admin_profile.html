@@ -69,33 +69,38 @@
   </div>
 
   <div class="poll-results">
-    <h2>Previous Poll Results</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Poll Title</th>
-          <th>Winning Option</th>
-          <th>Total Votes</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Placeholder data, can be dynamically generated later -->
-        <tr>
-          <td>Best Player of 2024</td>
-          <td>Player X</td>
-          <td>120</td>
-          <td>Jan 15, 2025</td>
-        </tr>
-        <tr>
-          <td>Favorite Team</td>
-          <td>Thunderbolt</td>
-          <td>98</td>
-          <td>Feb 20, 2025</td>
-        </tr>
-      </tbody>
-    </table>
+    <h2>Previous Participation Polls</h2>
+    <div id="pollContainer"></div>
   </div>
+  
+  <script>
+    window.onload = function() {
+      const polls = JSON.parse(localStorage.getItem("polls")) || [];
+      const container = document.getElementById("pollContainer");
+  
+      container.innerHTML = "";
+  
+      polls.filter(p => p.type === "participation").forEach((poll) => {
+        let html = `
+          <div style="margin-bottom:20px; padding:15px; border:1px solid #ddd; border-radius:8px; background:white;">
+            <h3>${poll.title} (Deadline: ${poll.deadline})</h3>
+            <table style="width:100%; border-collapse:collapse;">
+              <tr><th style="border:1px solid #ddd; padding:8px;">Player</th>
+                  <th style="border:1px solid #ddd; padding:8px;">Response</th></tr>
+        `;
+        poll.players.forEach(player => {
+          html += `<tr>
+            <td style="border:1px solid #ddd; padding:8px;">${player.name}</td>
+            <td style="border:1px solid #ddd; padding:8px;">${player.response}</td>
+          </tr>`;
+        });
+        html += "</table></div>";
+  
+        container.innerHTML += html;
+      });
+    }
+  </script>
+
 
 </body>
 </html>
