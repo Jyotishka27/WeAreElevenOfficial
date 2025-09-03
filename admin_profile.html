@@ -23,11 +23,13 @@
       <a href="football_auctioneer.html" class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-lg shadow-lg">Host an Auction</a>
     </div>
 
+    <!-- Current Poll -->
     <section class="bg-gray-800 p-6 rounded-xl shadow-lg">
       <h2 class="text-xl font-bold text-green-400 mb-4">Current Poll & Results</h2>
       <div id="pollContainer">Loading poll...</div>
     </section>
 
+    <!-- Poll History -->
     <section class="bg-gray-800 p-6 rounded-xl shadow-lg mt-6">
       <h2 class="text-xl font-bold text-green-400 mb-4">Poll History</h2>
       <div id="pollHistory">Loading...</div>
@@ -69,27 +71,49 @@
       let html = `
         <h3 class="text-lg font-semibold mb-2">${poll.question}</h3>
         <p class="text-sm text-gray-400 mb-4">Status: ${poll.status}</p>
-        <h4 class="font-semibold mb-2">Votes:</h4>
-        <ul id="voteList" class="space-y-1"></ul>
+        <h4 class="font-semibold mb-4">Votes:</h4>
+        <div id="voteList"></div>
       `;
       pollContainer.innerHTML = html;
     });
 
-    // Live votes tally
+    // Live grouped votes
     onSnapshot(votesCol, (snapshot) => {
       const voteList = document.getElementById("voteList");
       if (!voteList) return;
-      voteList.innerHTML = "";
-      let counts = { Yes: 0, No: 0, Maybe: 0 };
+
+      let groups = { Yes: [], No: [], Maybe: [] };
+
       snapshot.forEach(docSnap => {
         const v = docSnap.data();
-        counts[v.choice] = (counts[v.choice] || 0) + 1;
-        voteList.innerHTML += `<li>${v.name || v.email}: <span class="font-semibold">${v.choice}</span></li>`;
+        if (groups[v.choice]) {
+          groups[v.choice].push(v.name || v.email || "Anonymous");
+        }
       });
-      voteList.innerHTML += `
-        <li><b>Yes:</b> ${counts.Yes}</li>
-        <li><b>No:</b> ${counts.No}</li>
-        <li><b>Maybe:</b> ${counts.Maybe}</li>
+
+      voteList.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-green-700 p-4 rounded-lg shadow">
+            <h4 class="font-semibold mb-2">✅ Yes (${groups.Yes.length})</h4>
+            <ul class="list-disc list-inside text-sm">
+              ${groups.Yes.map(p => `<li>${p}</li>`).join("") || "<li>—</li>"}
+            </ul>
+          </div>
+
+          <div class="bg-red-700 p-4 rounded-lg shadow">
+            <h4 class="font-semibold mb-2">❌ No (${groups.No.length})</h4>
+            <ul class="list-disc list-inside text-sm">
+              ${groups.No.map(p => `<li>${p}</li>`).join("") || "<li>—</li>"}
+            </ul>
+          </div>
+
+          <div class="bg-yellow-600 p-4 rounded-lg shadow">
+            <h4 class="font-semibold mb-2">🤔 Maybe (${groups.Maybe.length})</h4>
+            <ul class="list-disc list-inside text-sm">
+              ${groups.Maybe.map(p => `<li>${p}</li>`).join("") || "<li>—</li>"}
+            </ul>
+          </div>
+        </div>
       `;
     });
 
