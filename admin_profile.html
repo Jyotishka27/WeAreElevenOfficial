@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Profile</title>
+  <link rel="stylesheet" href="styles.css"> <!-- optional, if you already have -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f8f9fa;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .btn {
+      padding: 15px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+      transition: 0.3s;
+      text-decoration: none;
+    }
+    .btn:hover {
+      background: #0056b3;
+    }
+    .poll-results {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+    th {
+      background: #007bff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Admin Dashboard</h1>
+
+  <div class="button-container">
+    <a href="create_poll.html" class="btn">Host a Poll</a>
+    <a href="football_auctioneer.html" class="btn">Host an Auction</a>
+  </div>
+
+  <div class="poll-results">
+    <h2>Previous Poll Results</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Poll Title</th>
+          <th>Winning Option</th>
+          <th>Total Votes</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Placeholder data, can be dynamically generated later -->
+        <tr>
+          <td>Best Player of 2024</td>
+          <td>Player X</td>
+          <td>120</td>
+          <td>Jan 15, 2025</td>
+        </tr>
+        <tr>
+          <td>Favorite Team</td>
+          <td>Thunderbolt</td>
+          <td>98</td>
+          <td>Feb 20, 2025</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</body>
+</html>
