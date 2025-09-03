@@ -2,82 +2,66 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Create / Publish Poll - We Are Eleven</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Participation Poll</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f8f9fa; padding: 20px; }
+    h1 { text-align: center; }
+    form { max-width: 600px; margin: auto; background: white; padding: 20px;
+           border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    label { display: block; margin-top: 15px; }
+    input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; }
+    button { margin-top: 20px; padding: 12px; width: 100%; background: #007bff; border: none;
+             color: white; font-size: 16px; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+  </style>
 </head>
-<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
-  <div class="bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-xl">
-    <h2 class="text-2xl font-bold text-green-400 mb-6">Create & Publish Poll</h2>
+<body>
 
-    <label class="block text-sm text-gray-300 mb-2">Poll Question</label>
-    <input id="pollQuestion" type="text" placeholder="e.g. Are you playing this Saturday?"
-           class="w-full px-4 py-2 rounded-lg mb-4 text-black" />
+  <h1>Create Participation Poll</h1>
 
-    <div class="flex items-center gap-2 mb-6">
-      <input id="resetVotes" type="checkbox" class="w-4 h-4" />
-      <label for="resetVotes" class="text-sm text-gray-300">Reset previous votes (if any)</label>
-    </div>
+  <form id="pollForm">
+    <label>Match Title:</label>
+    <input type="text" id="pollTitle" placeholder="Match vs Thunderbolt - Sept 10" required>
 
-    <div class="grid grid-cols-2 gap-3">
-      <button id="createBtn" class="bg-slate-600 hover:bg-slate-700 py-3 rounded-lg font-semibold">Save as Draft</button>
-      <button id="publishBtn" class="bg-green-500 hover:bg-green-600 py-3 rounded-lg font-semibold">Publish Now</button>
-    </div>
+    <label>Players (comma separated):</label>
+    <input type="text" id="pollPlayers" placeholder="Player1, Player2, Player3" required>
 
-    <div class="mt-6 text-sm text-gray-300">
-      <p>Status: <span id="statusText" class="font-semibold">Idle</span></p>
-      <p id="hint" class="mt-2 text-gray-400">Users will see the poll on their Profile page when status is <span class="text-green-400">ACTIVE</span>.</p>
-    </div>
-  </div>
+    <label>Deadline:</label>
+    <input type="date" id="pollDeadline" required>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-      getFirestore, doc, setDoc, getDocs, collection, deleteDoc, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    <button type="submit">Host Participation Poll</button>
+  </form>
 
-    // Use same Firebase config as profile.html
-    const firebaseConfig = {
-  apiKey: "AIzaSyB0DaaYB1hZLY8h23QOpT7Ok4sX5ACkHTM",
-  authDomain: "we-are-eleven.firebaseapp.com",
-  databaseURL: "https://we-are-eleven-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "we-are-eleven",
-  storageBucket: "we-are-eleven.firebasestorage.app",
-  messagingSenderId: "446706356039",
-  appId: "1:446706356039:web:54cc424f2a8178ae824662",
-  measurementId: "G-CX1LHHXBDQ"
-};
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  <script>
+    document.getElementById("pollForm").addEventListener("submit", function(e) {
+      e.preventDefault();
 
-    const statusText = document.getElementById("statusText");
-    async function writePoll(status) {
-      const q = document.getElementById("pollQuestion").value?.trim();
-      if (!q) { statusText.textContent = "Please enter a question."; return; }
-      statusText.textContent = "Saving...";
+      const title = document.getElementById("pollTitle").value.trim();
+      const players = document.getElementById("pollPlayers").value.split(",").map(p => p.trim());
+      const deadline = document.getElementById("pollDeadline").value;
 
-      // Optionally clear previous votes
-      if (document.getElementById("resetVotes").checked) {
-        try {
-          const votesCol = collection(db, "polls", "current", "votes");
-          const snaps = await getDocs(votesCol);
-          await Promise.all(snaps.docs.map(d => deleteDoc(d.ref)));
-        } catch(e) {
-          console.warn("Failed to clear old votes:", e);
-        }
+      if (!title || players.length < 2) {
+        alert("Please enter a match title and at least 2 players!");
+        return;
       }
 
-      await setDoc(doc(db, "polls", "current"), {
-        question: q,
-        status: status,               // 'DRAFT' | 'ACTIVE'
-        createdAt: serverTimestamp()
-      }, { merge: true });
+      // Save poll to localStorage
+      let polls = JSON.parse(localStorage.getItem("polls")) || [];
+      polls.push({
+        type: "participation",
+        title,
+        players: players.map(p => ({ name: p, response: "Pending" })), // each player starts as "Pending"
+        deadline,
+        createdAt: new Date().toLocaleString()
+      });
 
-      statusText.textContent = status === "ACTIVE" ? "✅ Published" : "💾 Saved as Draft";
-    }
+      localStorage.setItem("polls", JSON.stringify(polls));
 
-    document.getElementById("createBtn").addEventListener("click", () => writePoll("DRAFT"));
-    document.getElementById("publishBtn").addEventListener("click", () => writePoll("ACTIVE"));
+      alert("Participation Poll hosted successfully!");
+      window.location.href = "admin_profile.html"; // redirect back
+    });
   </script>
+
 </body>
 </html>
