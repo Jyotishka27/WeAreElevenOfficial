@@ -1,118 +1,101 @@
-/* wae-colors.css
-   We Are Eleven global color variables + small UI utilities
-   Drop this file in your project and include it in all pages.
-*/
+/* wae-colors.css — exact palette to match uploaded screenshot */
 
+/* Brand colors (pixel-extracted) */
 :root{
-  /* Primary brand palette */
-  --wae-bg: #111827;          /* deep navy / near-black background */
-  --wae-panel: #0f1724;       /* panel / card background */
-  --wae-accent: #FFD700;      /* primary gold accent */
-  --wae-accent-600: #E6BE00;  /* darker gold for hover */
-  --wae-text: #F9FAFB;        /* main readable text on dark bg */
-  --wae-text-muted: #CBD5E1;  /* secondary/muted text */
-  --wae-input: #0b1220;       /* input background */
-  --wae-border: #23303f;      /* borders / subtle lines */
-  --wae-success: #22c55e;     /* success messages */
-  --wae-error: #EF4444;       /* error messages (red) */
-
-  /* Spacing / radius */
+  --wae-nav-bg: #1F2937;       /* header/dark nav (exact from image) */
+  --wae-hero-mid: #898989;     /* hero mid gray (center) */
+  --wae-hero-dark: #3A3A3A;    /* hero darker stop for gradient */
+  --wae-cta-green: #22C55E;    /* Join Us button - exact green */
+  --wae-white: #FFFFFF;        /* card background / text on dark bg */
+  --wae-text-muted: #CBD5E1;   /* muted text */
+  --wae-border: rgba(255,255,255,0.06);
   --wae-radius: 12px;
-  --wae-gap: 0.75rem;
 }
 
-/* Page background helpers */
+/* Page background (default) */
 .wae-bg {
-  background: linear-gradient(180deg, var(--wae-bg) 0%, #071026 100%);
-  color: var(--wae-text);
+  background: linear-gradient(180deg, #071026 0%, #071126 100%);
+  color: var(--wae-white);
+  min-height: 100%;
+}
+
+/* Hero (use this on membership page hero area) */
+/* This closely matches the screenshot: smooth gray gradient with darker bottom */
+.wae-hero {
+  background: linear-gradient(180deg, var(--wae-hero-mid) 10%, var(--wae-hero-dark) 90%);
+  color: var(--wae-white);
+  padding: 5rem 1rem;
+  text-align: center;
+}
+
+/* Header / nav */
+.wae-nav {
+  background: var(--wae-nav-bg);
+  color: var(--wae-white);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.4);
+  border-bottom: 1px solid rgba(255,255,255,0.02);
 }
 
 /* Card / panel */
 .wae-panel {
-  background: linear-gradient(180deg, var(--wae-panel), #071126);
-  border: 1px solid rgba(255,255,255,0.03);
+  background: var(--wae-white);
+  color: #0b1220;
   border-radius: var(--wae-radius);
-  padding: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--wae-border);
+  box-shadow: 0 8px 20px rgba(2,6,23,0.15);
 }
 
-/* Buttons */
-.wae-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: .5rem;
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform .12s ease, box-shadow .12s ease;
-  user-select: none;
-}
-
-.wae-btn-primary {
-  background: linear-gradient(180deg, var(--wae-accent), var(--wae-accent-600));
-  color: #071126;
-  box-shadow: 0 10px 24px rgba(230,190,0,0.12);
-  border: none;
-}
-.wae-btn-primary:hover { transform: translateY(-1px); }
-
-.wae-btn-ghost {
-  background: transparent;
-  color: var(--wae-text-muted);
-  border: 1px solid rgba(255,255,255,0.04);
-}
-.wae-btn-ghost:hover {
-  background: rgba(255,255,255,0.02);
-  color: var(--wae-text);
-}
-
-/* Inputs */
+/* Inputs (on dark backgrounds) */
 .wae-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  background: var(--wae-input);
-  border: 1px solid var(--wae-border);
-  color: var(--wae-text);
   border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: var(--wae-white);
   font-size: 1rem;
-  transition: box-shadow .12s ease, border-color .12s ease;
 }
-.wae-input::placeholder { color: rgba(249,250,251,0.35); }
-.wae-input:focus {
-  outline: none;
-  box-shadow: 0 0 0 6px rgba(255,215,0,0.08);
-  border-color: var(--wae-accent-600);
+.wae-input::placeholder { color: rgba(255,255,255,0.45); }
+
+/* Primary CTA (Join Us) */
+.wae-btn {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: .75rem 1rem;
+  border-radius: 9999px;
+  font-weight:700;
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease;
+  border: none;
+}
+.wae-btn-primary {
+  background: linear-gradient(180deg, var(--wae-cta-green), #1fa34f);
+  color: #0b1220;
+  box-shadow: 0 10px 24px rgba(34,197,94,0.12);
+}
+.wae-btn-primary:hover { transform: translateY(-2px); }
+
+/* Secondary CTA / pill */
+.wae-pill {
+  background: rgba(255,255,255,0.06);
+  color: var(--wae-white);
+  padding: .5rem .9rem;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.035);
 }
 
-/* Links / accents */
-.wae-link {
-  color: var(--wae-accent);
-  text-decoration: none;
-  font-weight: 600;
-}
-.wae-link:hover { text-decoration: underline; }
-
-/* Status texts */
-.wae-success { color: var(--wae-success); }
-.wae-error { color: var(--wae-error); }
+/* Links / muted text */
+.wae-link { color: var(--wae-cta-green); font-weight:600; text-decoration:none; }
 .wae-muted { color: var(--wae-text-muted); }
 
-/* Small utilities */
-.rounded-xl { border-radius: 14px; }
-.shadow-soft { box-shadow: 0 8px 20px rgba(2,6,23,0.6); }
+/* Utility */
 .center { display:flex; align-items:center; justify-content:center; }
+.max-w-md { max-width: 720px; margin-left:auto; margin-right:auto; }
 
-/* Helpful: style for tab active */
-.wae-tab { padding: .6rem 1rem; border-radius: 8px; background: transparent; color: var(--wae-text-muted); border: 1px solid transparent; }
-.wae-tab.active {
-  color: var(--wae-text);
-  background: linear-gradient(90deg, rgba(255,215,0,0.12), rgba(255,215,0,0.04));
-  border-color: rgba(255,215,0,0.12);
-}
-
-/* Make it responsive-friendly */
-@media (max-width:480px) {
+/* Responsive tweaks */
+@media (max-width:640px){
+  .wae-hero { padding: 3.5rem 1rem; }
   .wae-panel { padding: 1rem; }
-  .wae-btn { width: 100%; justify-content:center; }
 }
