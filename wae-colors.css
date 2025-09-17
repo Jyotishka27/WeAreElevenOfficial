@@ -1,0 +1,118 @@
+/* wae-colors.css
+   We Are Eleven global color variables + small UI utilities
+   Drop this file in your project and include it in all pages.
+*/
+
+:root{
+  /* Primary brand palette */
+  --wae-bg: #111827;          /* deep navy / near-black background */
+  --wae-panel: #0f1724;       /* panel / card background */
+  --wae-accent: #FFD700;      /* primary gold accent */
+  --wae-accent-600: #E6BE00;  /* darker gold for hover */
+  --wae-text: #F9FAFB;        /* main readable text on dark bg */
+  --wae-text-muted: #CBD5E1;  /* secondary/muted text */
+  --wae-input: #0b1220;       /* input background */
+  --wae-border: #23303f;      /* borders / subtle lines */
+  --wae-success: #22c55e;     /* success messages */
+  --wae-error: #EF4444;       /* error messages (red) */
+
+  /* Spacing / radius */
+  --wae-radius: 12px;
+  --wae-gap: 0.75rem;
+}
+
+/* Page background helpers */
+.wae-bg {
+  background: linear-gradient(180deg, var(--wae-bg) 0%, #071026 100%);
+  color: var(--wae-text);
+}
+
+/* Card / panel */
+.wae-panel {
+  background: linear-gradient(180deg, var(--wae-panel), #071126);
+  border: 1px solid rgba(255,255,255,0.03);
+  border-radius: var(--wae-radius);
+  padding: 1.5rem;
+}
+
+/* Buttons */
+.wae-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease;
+  user-select: none;
+}
+
+.wae-btn-primary {
+  background: linear-gradient(180deg, var(--wae-accent), var(--wae-accent-600));
+  color: #071126;
+  box-shadow: 0 10px 24px rgba(230,190,0,0.12);
+  border: none;
+}
+.wae-btn-primary:hover { transform: translateY(-1px); }
+
+.wae-btn-ghost {
+  background: transparent;
+  color: var(--wae-text-muted);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.wae-btn-ghost:hover {
+  background: rgba(255,255,255,0.02);
+  color: var(--wae-text);
+}
+
+/* Inputs */
+.wae-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--wae-input);
+  border: 1px solid var(--wae-border);
+  color: var(--wae-text);
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: box-shadow .12s ease, border-color .12s ease;
+}
+.wae-input::placeholder { color: rgba(249,250,251,0.35); }
+.wae-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 6px rgba(255,215,0,0.08);
+  border-color: var(--wae-accent-600);
+}
+
+/* Links / accents */
+.wae-link {
+  color: var(--wae-accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.wae-link:hover { text-decoration: underline; }
+
+/* Status texts */
+.wae-success { color: var(--wae-success); }
+.wae-error { color: var(--wae-error); }
+.wae-muted { color: var(--wae-text-muted); }
+
+/* Small utilities */
+.rounded-xl { border-radius: 14px; }
+.shadow-soft { box-shadow: 0 8px 20px rgba(2,6,23,0.6); }
+.center { display:flex; align-items:center; justify-content:center; }
+
+/* Helpful: style for tab active */
+.wae-tab { padding: .6rem 1rem; border-radius: 8px; background: transparent; color: var(--wae-text-muted); border: 1px solid transparent; }
+.wae-tab.active {
+  color: var(--wae-text);
+  background: linear-gradient(90deg, rgba(255,215,0,0.12), rgba(255,215,0,0.04));
+  border-color: rgba(255,215,0,0.12);
+}
+
+/* Make it responsive-friendly */
+@media (max-width:480px) {
+  .wae-panel { padding: 1rem; }
+  .wae-btn { width: 100%; justify-content:center; }
+}
