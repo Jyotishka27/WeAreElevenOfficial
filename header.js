@@ -9,7 +9,7 @@ export function injectHeader(targetSelector, { active = "" } = {}) {
     { key: "home", label: "Home", href: "index.html" },
     { key: "tournaments", label: "Tournaments", href: "tournament.html" },
     { key: "about", label: "About Us", href: "about_us.html" },
-    { key: "login", label: "login", href: "login.html" },
+    { key: "login", label: "Login", href: "login.html" },
     { key: "photos", label: "Photos", href: "gallery.html" } // ← NEW
   ];
 
