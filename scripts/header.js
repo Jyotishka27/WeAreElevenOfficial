@@ -35,7 +35,7 @@ export function injectHeader(targetSelector, { active = "" } = {}) {
         <!-- Left: Brand -->
         <div class="flex items-center gap-3">
           <a href="index.html" class="flex items-center gap-2">
-            <img src="We_are_eleven_logo.jpg" alt="We Are Eleven logo" class="h-8 w-8 rounded-full object-cover" />
+            <img src="./assets/We_are_eleven_logo.jpg" alt="We Are Eleven logo" class="h-8 w-8 rounded-full object-cover" />
             <span class="text-white font-semibold tracking-wide">We Are Eleven</span>
           </a>
         </div>
